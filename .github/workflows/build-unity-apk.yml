@@ -1,0 +1,43 @@
+name: Build Walhero Battle Lite APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract Unity project
+        run: unzip -o Walhero-Battle-Lite-Unity.zip
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Walhero-Battle-Lite-Unity/Library
+          key: unity-library-${{ hashFiles('Walhero-Battle-Lite-Unity/Assets/**', 'Walhero-Battle-Lite-Unity/Packages/**', 'Walhero-Battle-Lite-Unity/ProjectSettings/**') }}
+          restore-keys: unity-library-
+
+      - name: Build Android APK
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: Walhero-Battle-Lite-Unity
+          targetPlatform: Android
+          unityVersion: 6000.0.71f1
+          buildMethod: BuildAndroid.PerformBuild
+          customParameters: -BUILD_PATH Builds/Walhero-Battle-Lite.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Walhero-Battle-Lite-APK
+          path: Walhero-Battle-Lite-Unity/Builds/Walhero-Battle-Lite.apk
