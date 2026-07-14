@@ -13,14 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract Unity project
-        run: unzip -o Walhero-Battle-Lite-Unity.zip
+      - name: Rebuild and extract Unity project
+        shell: bash
+        run: |
+          cat project_parts/part*.b64 > Walhero-Battle-Lite-Unity.zip.b64
+          base64 --decode Walhero-Battle-Lite-Unity.zip.b64 > Walhero-Battle-Lite-Unity.zip
+          echo "130f3b8701dcec16d90582ebbdbd2f5014fa3fc384275585f8a4a510ea2c4d6a  Walhero-Battle-Lite-Unity.zip" | sha256sum --check
+          unzip -o Walhero-Battle-Lite-Unity.zip
 
       - name: Cache Unity Library
         uses: actions/cache@v4
         with:
           path: Walhero-Battle-Lite-Unity/Library
-          key: unity-library-${{ hashFiles('Walhero-Battle-Lite-Unity/Assets/**', 'Walhero-Battle-Lite-Unity/Packages/**', 'Walhero-Battle-Lite-Unity/ProjectSettings/**') }}
+          key: unity-library-${{ hashFiles('project_parts/**') }}
           restore-keys: unity-library-
 
       - name: Build Android APK
