@@ -40,6 +40,7 @@ jobs:
           unityVersion: 6000.0.71f1
           buildMethod: BuildAndroid.PerformBuild
           customParameters: -BUILD_PATH Builds/Walhero-Battle-Lite.apk
+          allowDirtyBuild: true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
